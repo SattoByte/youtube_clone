@@ -1,11 +1,12 @@
 import ReactPlayer from "react-player";
 import { Typography, Box, Stack } from "@mui/material";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from 'react-router-dom';
-import { CheckCircle } from "@mui/icons-material";
+import  CheckCircle  from "@mui/icons-material/CheckCircle";
 
-import { Videos } from './';
+import { Videos } from "./";
 import { fetchFromAPI } from "../utils/fetchFromAPI";
+import Loader from "./Loader";
 
 const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
@@ -14,13 +15,18 @@ const VideoDetail = () => {
 
   useEffect(() => {
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
-      .then((data) => setVideoDetail(data.items[0]))
+    // .then((data) => setVideoDetail(data.items[0]));
+        .then((data) => {
+          setVideoDetail(data.items[0])
+          console.log("TEST: ", data.items[0].id);
+  });
 
+    
     fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
-      .then((data) => setVideos(data.items));
+    .then((data) => setVideos(data.items));
   }, [id]);
-
-  if (!videoDetail?.snippet) return 'Loading...';
+  
+  if (!videoDetail?.snippet) return <Loader />;
 
   const { snippet: { title, channelId, channelTitile }, statistics: { viewCount, likeCount } } = videoDetail;
 
@@ -55,7 +61,7 @@ const VideoDetail = () => {
           </Box>
         </Box>
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center">
-          <Videos videos={videos} />
+          <Videos videos={videos} direction="column"/>
         </Box>
       </Stack >
     </Box >
